@@ -14,7 +14,10 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: ["https://clinic-frontend-pearl-delta.vercel.app", "http://localhost:5173"], // Frontend Link အသစ်ကို ထည့်ပေးခြင်း
+    credentials: true
+}));
 app.use(express.json());
 
 connectDB();
