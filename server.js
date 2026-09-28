@@ -16,7 +16,7 @@ const app = express();
 
 app.use(cors({
     origin: [
-        "https://clinic-frontend-i6xo.vercel.app" // Vercel အွန်လိုင်း (အသစ်) အတွက်
+        "https://clinic-frontend-i6xo.vercel.app"
     ],
     credentials: true
 }));
