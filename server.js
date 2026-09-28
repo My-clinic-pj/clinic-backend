@@ -14,10 +14,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-    origin: ["https://clinic-frontend-pearl-delta.vercel.app", "http://localhost:5173"], // Frontend Link အသစ်ကို ထည့်ပေးခြင်း
-    credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
 connectDB();
@@ -41,5 +38,5 @@ if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
-// Vercel အတွက် Export လုပ်ပေးခြင်း
-module.exports = app;
+
+export default app;
