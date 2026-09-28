@@ -1,16 +1,15 @@
 import User from '../models/user.model.js';
 
-// @desc    ဝန်ထမ်း/ဆရာဝန် အကောင့်အသစ် ဖန်တီးရန်
-// @route   POST /api/users
+
 export const createUser = async (req, res) => {
     try {
-        const { clerkUserId, clinicId, name, email, role } = req.body;
+        const { username, phone, password, clinicId, role } = req.body;
 
         const user = await User.create({
-            clerkUserId,
+            username,
+            phone,
+            password,
             clinicId,
-            name,
-            email,
             role
         });
 
@@ -20,8 +19,7 @@ export const createUser = async (req, res) => {
     }
 };
 
-// @desc    သက်ဆိုင်ရာ ဆေးခန်းတစ်ခုတည်းမှ ဝန်ထမ်းများကိုသာ ဆွဲထုတ်ရန်
-// @route   GET /api/users/clinic/:clinicId
+
 export const getClinicUsers = async (req, res) => {
     try {
         const users = await User.find({ clinicId: req.params.clinicId });
