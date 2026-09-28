@@ -14,7 +14,12 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        "https://clinic-frontend-i6xo.vercel.app" // Vercel အွန်လိုင်း (အသစ်) အတွက်
+    ],
+    credentials: true
+}));
 app.use(express.json());
 
 connectDB();
