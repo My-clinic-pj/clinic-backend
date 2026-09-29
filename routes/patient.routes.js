@@ -19,3 +19,5 @@ router.route('/:id')
     .delete(requireAuth, deletePatient); // ဖျက်မယ်ဆိုရင် ဂိတ်ကိုအရင်ဖြတ်ပါ
 
 export default router;
+
+//update id field
