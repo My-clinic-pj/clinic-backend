@@ -4,6 +4,7 @@ import Patient from '../models/patient.js';
 // @route   POST /api/patients
 export const createPatient = async (req, res) => {
     try {
+        // req.body ထဲမှာ userId (ဒီလူနာကို သွင်းတဲ့ ဆရာဝန်ရဲ့ ID) ပါလာရပါမယ်။
         const newPatient = new Patient(req.body);
         const savedPatient = await newPatient.save();
 
@@ -15,17 +16,25 @@ export const createPatient = async (req, res) => {
 
 // @desc    သက်ဆိုင်ရာ ဆေးခန်းတစ်ခုတည်းမှ လူနာများကိုသာ ဆွဲထုတ်ရန် (Multi-tenant အသက်သွေးကြော)
 // @route   GET /api/patients/:clinicId
+// @desc    သက်ဆိုင်ရာ ဆေးခန်းတစ်ခုတည်းမှ လူနာများကိုသာ ဆွဲထုတ်ရန် (Multi-tenant အသက်သွေးကြော)
+// @route   GET /api/patients/clinic/:clinicId  (Route လမ်းကြောင်းကို ဒီလိုလေးထားရင် ပိုရှင်းပါတယ်)
 export const getPatients = async (req, res) => {
     try {
-        // URL ကနေ ပါလာတဲ့ clinicId ကို ယူပြီး အဲ့ဒီဆေးခန်းရဲ့ လူနာတွေကိုပဲ Database ကနေ ရှာပါမယ်
-        const patients = await Patient.find({ clinicId: req.params.clinicId });
+        // URL ကနေ ပါလာတဲ့ clinicId ကို ယူပါမယ်
+        const { clinicId } = req.params;
+
+        if (!clinicId) {
+            return res.status(400).json({ success: false, message: "Clinic ID လိုအပ်ပါသည်" });
+        }
+
+        // Database (Patient Model) ထဲမှာ ရှိတဲ့ clinicId နဲ့ တိုက်စစ်ပြီး ဆွဲထုတ်ပါမယ်
+        const patients = await Patient.find({ clinicId: clinicId });
 
         res.status(200).json({ success: true, count: patients.length, data: patients });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
 // @desc    လူနာအချက်အလက် ပြင်ဆင်ရန် (Update)
 // @route   PUT /api/patients/:id
 export const updatePatient = async (req, res, next) => {
@@ -46,9 +55,9 @@ export const updatePatient = async (req, res, next) => {
                 paymentAmount: paymentAmount || payment?.amount || payment?.paymentAmount,
                 reasonForReturn: reasonForReturn
             };
-            
+
             updateQuery.$push = { visitHistory: newVisit };
-            
+
             if (nextAppointmentDate !== undefined) {
                 updateData.nextAppointmentDate = nextAppointmentDate;
             }
