@@ -4,8 +4,14 @@ import Patient from '../models/patient.js';
 // @route   POST /api/patients
 export const createPatient = async (req, res) => {
     try {
-        // req.body ထဲမှာ userId (ဒီလူနာကို သွင်းတဲ့ ဆရာဝန်ရဲ့ ID) ပါလာရပါမယ်။
-        const newPatient = new Patient(req.body);
+        // Frontend ကနေ အမှားအယွင်းနဲ့ clinicId ပါလာခဲ့ရင်တောင် ဖယ်ထုတ်ပြီး ကျန်တဲ့ data (userId အပါအဝင်) ကိုပဲ ယူပါမယ်
+        const { clinicId, ...patientData } = req.body;
+
+        if (!patientData.userId) {
+            return res.status(400).json({ success: false, message: "Doctor (User) ID လိုအပ်ပါသည်" });
+        }
+
+        const newPatient = new Patient(patientData);
         const savedPatient = await newPatient.save();
 
         res.status(201).json({ success: true, data: savedPatient });
@@ -14,27 +20,26 @@ export const createPatient = async (req, res) => {
     }
 };
 
-// @desc    သက်ဆိုင်ရာ ဆေးခန်းတစ်ခုတည်းမှ လူနာများကိုသာ ဆွဲထုတ်ရန် (Multi-tenant အသက်သွေးကြော)
-// @route   GET /api/patients/:clinicId
-// @desc    သက်ဆိုင်ရာ ဆေးခန်းတစ်ခုတည်းမှ လူနာများကိုသာ ဆွဲထုတ်ရန် (Multi-tenant အသက်သွေးကြော)
-// @route   GET /api/patients/clinic/:clinicId  (Route လမ်းကြောင်းကို ဒီလိုလေးထားရင် ပိုရှင်းပါတယ်)
+// @desc    သက်ဆိုင်ရာ ဆရာဝန် (Doctor) တစ်ယောက်တည်းမှ လူနာများကိုသာ ဆွဲထုတ်ရန်
+// @route   GET /api/patients/doctor/:userId  (Route ကို clinic အစား doctor လို့ ပြောင်းသုံးရင် ပိုရှင်းပါတယ်)
 export const getPatients = async (req, res) => {
     try {
-        // URL ကနေ ပါလာတဲ့ clinicId ကို ယူပါမယ်
-        const { clinicId } = req.params;
+        // URL ကနေ ပါလာတဲ့ userId (Doctor ID) ကို ယူပါမယ်
+        const { userId } = req.params;
 
-        if (!clinicId) {
-            return res.status(400).json({ success: false, message: "Clinic ID လိုအပ်ပါသည်" });
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "Doctor (User) ID လိုအပ်ပါသည်" });
         }
 
-        // Database (Patient Model) ထဲမှာ ရှိတဲ့ clinicId နဲ့ တိုက်စစ်ပြီး ဆွဲထုတ်ပါမယ်
-        const patients = await Patient.find({ clinicId: clinicId });
+        // Database (Patient Model) ထဲမှာ ရှိတဲ့ userId နဲ့ တိုက်စစ်ပြီး ဆွဲထုတ်ပါမယ်
+        const patients = await Patient.find({ userId: userId });
 
         res.status(200).json({ success: true, count: patients.length, data: patients });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 // @desc    လူနာအချက်အလက် ပြင်ဆင်ရန် (Update)
 // @route   PUT /api/patients/:id
 export const updatePatient = async (req, res, next) => {
@@ -44,7 +49,6 @@ export const updatePatient = async (req, res, next) => {
         let updateQuery = { $set: updateData };
 
         // If status is changed to 'Completed', push a new visit object
-        // and optionally save the upcoming appointment details
         if (updateData.status === 'Completed') {
             const newVisit = {
                 date: Date.now(),
@@ -67,7 +71,7 @@ export const updatePatient = async (req, res, next) => {
         }
 
         const patient = await Patient.findByIdAndUpdate(req.params.id, updateQuery, {
-            new: true, // MUST use `new: true` in Mongoose to return the updated document
+            new: true,
             runValidators: true
         });
 
@@ -77,7 +81,7 @@ export const updatePatient = async (req, res, next) => {
 
         res.status(200).json({ success: true, data: patient });
     } catch (error) {
-        next(error); // Error Handler ဆီကို လှမ်းပို့လိုက်မယ်
+        next(error);
     }
 };
 

@@ -9,8 +9,8 @@ const router = express.Router();
 router.route('/')
     .post(createPatient);
 
-// လူနာစာရင်းဆွဲထုတ်ရန် 
-router.route('/clinic/:clinicId')
+// ⚠️ ပြင်ဆင်ချက်: လူနာစာရင်းဆွဲထုတ်ရန် (clinic အစား doctor/userId သို့ ပြောင်းထားပါသည်)
+router.route('/doctor/:userId')
     .get(getPatients);
 
 // ⚠️ ဒီနေရာမှာ requireAuth တွေ ဝင်လာပါပြီ

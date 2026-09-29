@@ -2,16 +2,17 @@ import mongoose from 'mongoose';
 
 const patientSchema = new mongoose.Schema(
     {
-        // Multi-tenant အတွက် အရေးအကြီးဆုံး field (ဆေးခန်းနဲ့ ချိတ်ဆက်ခြင်း)
-        clinicId: {
+        // Multi-tenant (Clinic) အစား Doctor တစ်ယောက်ကို ဆေးခန်းတစ်ခုအဖြစ် သတ်မှတ်ရန်
+        // Doctor ရဲ့ User ID နဲ့ တိုက်ရိုက်ချိတ်ဆက်ပါမည်
+        userId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Clinic',
+            ref: 'User', // Clinic အစား User (Doctor) ကို ပြောင်းချိတ်ထားသည်
             required: true,
         },
         name: {
             type: String,
             required: [true, 'လူနာအမည် ထည့်ရန်လိုအပ်ပါသည်'],
-            trim: true, // ရှေ့နောက် space အပိုတွေကို အလိုလို ဖြတ်ပေးဖို့
+            trim: true,
         },
         phone: {
             type: String,
@@ -43,7 +44,7 @@ const patientSchema = new mongoose.Schema(
             bodyTemperature: String,
             paymentType: String,
             paymentAmount: Number,
-            reasonForReturn: String // if it was a follow-up
+            reasonForReturn: String
         }],
         nextAppointmentDate: {
             type: Date,
@@ -55,7 +56,7 @@ const patientSchema = new mongoose.Schema(
         }
     },
     {
-        timestamps: true, // createdAt နဲ့ updatedAt ကို အလိုလို ထည့်ပေးပါမယ်
+        timestamps: true,
     }
 );
 
